@@ -3,33 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/furatto-stock/manifest.json">
     
     <!-- Meta tags para PWA -->
     <meta name="theme-color" content="#ff6b6b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Furatto Inventario">
-    <!-- Service Worker -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js')
-        .then(function(registration) {
-          console.log('Service Worker registrado:', registration.scope);
-        })
-        .catch(function(error) {
-          console.log('Error:', error);
-        });
-    });
-  }
-</script>
     
     <!-- Íconos para PWA -->
-    <link rel="icon" type="image/png" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+    <link rel="icon" type="image/png" href="/furatto-stock/icon-192.png">
+    <link rel="apple-touch-icon" href="/furatto-stock/icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/furatto-stock/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/furatto-stock/icon-512.png">
     
     <title>Furatto - Inventario Restaurante</title>
     <style>
@@ -629,10 +615,10 @@
             alert(`✅ Se cargaron ${productNames.length} productos nuevos.`);
         }
 
-        // Service Worker para PWA
+        // Service Worker para PWA - ACTUALIZADO para GitHub Pages
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('/furatto-stock/sw.js')
                     .then(function(registration) {
                         console.log('Service Worker registrado con éxito:', registration.scope);
                     })
