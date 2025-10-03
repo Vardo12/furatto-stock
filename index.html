@@ -3,6 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Furatto Inventario">
+    <!-- Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js')
+        .then(function(registration) {
+          console.log('Service Worker registrado:', registration.scope);
+        })
+        .catch(function(error) {
+          console.log('Error:', error);
+        });
+    });
+  }
+</script>
+    
+    <!-- Íconos para PWA -->
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+    
     <title>Furatto - Inventario Restaurante</title>
     <style>
         * {
@@ -412,8 +440,6 @@
         </div>
     </div>
 
-
-
     <script>
         // Datos del inventario (basados en tu imagen)
         let inventoryData = [
@@ -601,6 +627,19 @@
             renderTable();
             closeLoadListModal();
             alert(`✅ Se cargaron ${productNames.length} productos nuevos.`);
+        }
+
+        // Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registrado con éxito:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('Error al registrar Service Worker:', error);
+                    });
+            });
         }
 
         // Inicializar
