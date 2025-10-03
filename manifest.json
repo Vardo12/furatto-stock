@@ -1,25 +1,24 @@
 {
   "name": "Furatto - Inventario Restaurante",
-  "short_name": "Furatto Stock",
-  "description": "Sistema de gestión de inventario para restaurante",
-  "start_url": "/",
+  "short_name": "Furatto Stock", 
+  "description": "Sistema de gestión de inventario",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ff6b6b",
   "orientation": "portrait",
   "id": "/",
+  "scope": "./",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "./icon-512.png", 
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
