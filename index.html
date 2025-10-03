@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furatto - Inventario Restaurante</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .current-date {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ee5a24;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            font-size: 14px;
+        }
+
+        .excel-table th {
+            background: linear-gradient(135deg, #2e86de, #0abde3);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            border: none;
+            position: sticky;
+            top: 0;
+            font-size: 15px;
+        }
+
+        .excel-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .excel-table tr:hover td {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .excel-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .producto {
+            font-weight: 600;
+            color: #2d3436;
+            font-size: 14px;
+        }
+
+        .cantidad {
+            text-align: center;
+            font-weight: 700;
+            background: #ffeaa7;
+            padding: 8px 12px;
+            border-radius: 20px;
+            color: #e17055;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .fecha {
+            color: #636e72;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .category-marker {
+            width: 4px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .category-proteina { background: #ff6b6b; }
+        .category-gyosas { background: #48dbfb; }
+        .category-vegetales { background: #1dd1a1; }
+        .category-insumos { background: #f368e0; }
+        .category-bebidas { background: #ff9f43; }
+
+        .actions {
+            padding: 25px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2e86de, #0abde3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #fdcb6e, #f39c12);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .excel-table th,
+            .excel-table td {
+                padding: 12px 8px;
+                font-size: 13px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                flex: 1;
+                min-width: 140px;
+                font-size: 14px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .excel-table {
+                min-width: 600px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Scroll personalizado */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #2e86de, #0abde3);
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #1b6db0, #0984b3);
+        }
+
+        /* Estilos para el Modal */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.4s;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0} 
+            to {opacity: 1}
+        }
+        @keyframes slideIn {
+            from {transform: translateY(-50px)}
+            to {transform: translateY(0)}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍣 Furatto - Inventario</h1>
+            <p>Control de productos y ingredientes del restaurante</p>
+            <div class="current-date" id="current-date-header"></div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-products">0</div>
+                <div class="stat-label">Total Productos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="protein-count">0</div>
+                <div class="stat-label">Proteínas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="gyoza-count">0</div>
+                <div class="stat-label">Gyozas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="today-date">03/10</div>
+                <div class="stat-label">Fecha Actual</div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <th width="40%">🍽️ PRODUCTO</th>
+                        <th width="30%">📊 CANTIDAD</th>
+                        <th width="30%">📅 FECHA</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Los datos se cargarán con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="exportToExcel()">
+                📥 Descargar Excel
+            </button>
+            <button class="btn btn-success" onclick="addNewProduct()">
+                ➕ Nuevo Producto
+            </button>
+            <button class="btn btn-warning" onclick="refreshInventory()">
+                🔄 Actualizar
+            </button>
+            <button class="btn btn-info" onclick="openLoadListModal()">
+                📝 Cargar Lista
+            </button>
+            <select class="btn btn-info" id="category-filter" onchange="filterByCategory(this.value)">
+                <option value="all">📂 Ver Todas las Categorías</option>
+                <option value="proteina">🥩 Proteínas</option>
+                <option value="gyozas">🥟 Gyozas y Empanadas</option>
+                <option value="vegetales">🥕 Vegetales</option>
+                <option value="insumos">🧂 Insumos</option>
+                <option value="bebidas">🥤 Bebidas</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Modal para cargar lista -->
+    <div id="loadListModal" class="modal">
+        <div class="modal-content">
+            <h2>Cargar Nueva Lista de Productos</h2>
+            <p style="margin-bottom: 15px; color: #666;">Pega aquí la lista de productos, uno por línea. La lista actual será reemplazada.</p>
+            <textarea id="productListText" placeholder="Pollo&#10;Camarón&#10;Salmón&#10;..."></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-warning" onclick="closeLoadListModal()">Cancelar</button>
+                <button class="btn btn-success" onclick="processPastedList()">Confirmar y Cargar</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        // Datos del inventario (basados en tu imagen)
+        let inventoryData = [
+            // Proteínas
+            { producto: "Pollo", cantidad: "12 Kilo", fecha: "03-10-2025", categoria: "proteina" },
+            { producto: "Camaron", cantidad: "12 Kilo", fecha: "03-10-2025", categoria: "proteina" },
+            { producto: "Kanikama", cantidad: "1 Unidad", fecha: "03-10-2025", categoria: "proteina" },
+            { producto: "Salmón", cantidad: "21 Kilo", fecha: "03-10-2025", categoria: "proteina" },
+            { producto: "Tilapia", cantidad: "1 Kilo", fecha: "03-10-2025", categoria: "proteina" },
+            
+            // Gyozas
+            { producto: "Gyozas Pollo", cantidad: "21 Unidades", fecha: "03-10-2025", categoria: "gyozas" },
+            { producto: "Gyozas Camaron", cantidad: "34 Unidades", fecha: "03-10-2025", categoria: "gyozas" },
+            { producto: "Gyozas Cerdo", cantidad: "1 Unidad", fecha: "03-10-2025", categoria: "gyozas" },
+            { producto: "Empanadas Camaron", cantidad: "31 Unidades", fecha: "03-10-2025", categoria: "gyozas" },
+            
+            // Vegetales
+            { producto: "Palta", cantidad: "31 Kilo", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Cebollín", cantidad: "1 Paquete", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Ciboulette", cantidad: "231 Paquete", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Palmito", cantidad: "12 Unidades", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Champiñón", cantidad: "2 Unidades", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Choclo", cantidad: "1 Congelado", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Choclito Coctel", cantidad: "1 Paquete", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Aceituna", cantidad: "1 Kilo", fecha: "03-10-2025", categoria: "vegetales" },
+            { producto: "Aceituna Negra", cantidad: "1 Kilo", fecha: "03-10-2025", categoria: "vegetales" },
+            
+            // Insumos
+            { producto: "Sésamo", cantidad: "23 Unidades", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Panko", cantidad: "31 Unidad", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Harina", cantidad: "2 Kilo", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Aceite 5lt", cantidad: "1 Unidad", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Nori", cantidad: "1 Paquete", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Queso", cantidad: "2 Unidad", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Arroz", cantidad: "11 Kilo", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Huevo Pasteurizado", cantidad: "1 Unidad", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Azúcar", cantidad: "2 Kilo", fecha: "03-10-2025", categoria: "insumos" },
+            { producto: "Salsa Ostra", cantidad: "21 Unidades", fecha: "03-10-2025", categoria: "insumos" },
+            
+            // Bebidas
+            { producto: "Coca Cola Normal", cantidad: "5lt", fecha: "03-10-2025", categoria: "bebidas" },
+            { producto: "Coca Cola Zero", cantidad: "5lt", fecha: "03-10-2025", categoria: "bebidas" },
+            { producto: "Fanta", cantidad: "5lt", fecha: "03-10-2025", categoria: "bebidas" },
+            { producto: "Sprite", cantidad: "5lt", fecha: "03-10-2025", categoria: "bebidas" }
+        ];
+
+        function formatCurrentDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        function renderTable(filter = 'all') {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            const filteredData = inventoryData.filter(item => {
+                return filter === 'all' || item.categoria === filter;
+            });
+
+            filteredData.forEach((item) => {
+                // Encontramos el índice original para poder actualizarlo
+                const originalIndex = inventoryData.findIndex(originalItem => originalItem.producto === item.producto);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="producto">
+                        <div class="category-marker category-${item.categoria}"></div>
+                        ${item.producto}
+                    </td>
+                    <td>
+                        <span class="cantidad" style="padding: 0;">
+                            <input type="text" value="${item.cantidad}" class="qty-input" onchange="updateQuantity(${originalIndex}, this.value)" style="padding: 8px 12px;">
+                        </span> 
+                    </td>
+                    <td class="fecha">${item.fecha}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            updateStats();
+        }
+
+        function filterByCategory(category) {
+            renderTable(category);
+        }
+
+        function updateQuantity(index, newQuantity) {
+            inventoryData[index].cantidad = newQuantity;
+            inventoryData[index].fecha = formatCurrentDate(new Date());
+            const currentFilter = document.getElementById('category-filter').value;
+            renderTable(currentFilter); // Re-renderizamos respetando el filtro actual
+        }
+
+        function updateStats() {
+            document.getElementById('total-products').textContent = inventoryData.length;
+            document.getElementById('protein-count').textContent = inventoryData.filter(item => item.categoria === 'proteina').length;
+            document.getElementById('gyoza-count').textContent = inventoryData.filter(item => item.categoria === 'gyozas').length;
+        }
+
+        function setCurrentDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            const dateString = now.toLocaleDateString('es-ES', options);
+            document.getElementById('current-date-header').textContent = dateString;
+        }
+
+        function exportToExcel() {
+            if (!inventoryData.length) {
+                alert('No hay productos en el inventario para exportar.');
+                return;
+            }
+
+            // Cabeceras del CSV
+            const headers = ['Producto', 'Cantidad', 'Fecha'];
+
+            // Construir filas del CSV. Usamos ; como separador para mejor compatibilidad con Excel.
+            const rows = inventoryData.map(p => {
+                const name = (p.producto || '').replace(/"/g, '""');
+                const qty = (p.cantidad || '').replace(/"/g, '""');
+                const date = (p.fecha || '').replace(/"/g, '""');
+                return `"${name}";"${qty}";"${date}"`;
+            });
+
+            // BOM para que Excel reconozca acentos y caracteres especiales (UTF-8)
+            const bom = '\uFEFF';
+            const csvContent = bom + headers.join(';') + '\n' + rows.join('\n');
+
+            // Crear y descargar el archivo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `furatto_stock_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+        }
+
+        function addNewProduct() {
+            // Esta función se puede mejorar para abrir un formulario, por ahora la dejamos como estaba.
+            alert('Función para agregar nuevo producto no implementada completamente.\nSe necesita un formulario para ingresar los detalles.');
+        }
+
+        function refreshInventory() {
+            setCurrentDate();
+            renderTable();
+            document.getElementById('category-filter').value = 'all'; // Resetea el filtro
+            alert('🔄 Inventario actualizado correctamente!');
+        }
+
+        // --- Funciones del Modal para Cargar Lista ---
+
+        function openLoadListModal() {
+            document.getElementById('loadListModal').style.display = 'block';
+        }
+
+        function closeLoadListModal() {
+            document.getElementById('loadListModal').style.display = 'none';
+            document.getElementById('productListText').value = ''; // Limpia el textarea
+        }
+
+        function processPastedList() {
+            const text = document.getElementById('productListText').value;
+            if (!text.trim()) {
+                alert('El área de texto está vacía. Pega una lista de productos.');
+                return;
+            }
+
+            const productNames = text.trim().split('\n');
+            const currentDate = formatCurrentDate(new Date());
+
+            inventoryData = productNames.map(name => ({
+                producto: name.trim(),
+                cantidad: '0 Unidades', // Valor por defecto
+                fecha: currentDate,
+                categoria: 'insumos' // Categoría por defecto
+            }));
+
+            renderTable();
+            closeLoadListModal();
+            alert(`✅ Se cargaron ${productNames.length} productos nuevos.`);
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            setCurrentDate();
+            renderTable();
+        });
+    </script>
+</body>
+</html>
